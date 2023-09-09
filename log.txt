@@ -1,0 +1,50 @@
+## 20230825
+
+add fftc2d, fftshift, etc.
+add getrow, setrow, tocomplex, real, imag, etc.
+add sinc, sincinterp1d/2d
+add grid linspace denselinear
+to ap.cs
+
+## 20230826
+
+add squeeze
+to ap.cs
+
+add interp2d (fast call for spline2d bicubic)
+to interpolation.cs
+
+##20230828
+
+add fast call for r/cmatrixcopy, cmatrixinv, cmatrixmv, etc.
+add fast call for retcmatrixinv
+to lialg.cs
+
+add fast call for retfftc2d
+to fasttransforms.cs
+
+add some basic operations
+abs, exp, pow, max, min, flipud, copy, tocomplex, formcomplex, etc. (applicable upto 2D array)
+to ap.cs
+
+##20230829
+
+add sin cos tan sind cods tand (can input complex values)
+to ap.cs 
+
+##20230902
+
+add add sub mul div pow (be called as x.add(y))
+to ap.cs
+
+##20230904
+
+add (i)fft1, (i)fft2 that resemble MATLAB usage
+to fasttransforms.cs
+
+##20230909 
+
+add log log10
+add get set (for general use to copy and set array elements)
+and other method overloads for 3D arrays
+to ap.cs
