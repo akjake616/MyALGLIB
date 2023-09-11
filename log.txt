@@ -48,3 +48,13 @@ add log log10
 add get set (for general use to copy and set array elements)
 and other method overloads for 3D arrays
 to ap.cs
+
+##20230911
+
+add ap.deps to return the third dimension size
+add getdep setdep
+add method overloads to get/set row/col
+to ap.cs
+
+add method overloads to fft1/ifft1 to handle 2D/3D arrys for specific dimension
+to fasttransforms.cs

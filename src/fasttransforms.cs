@@ -43,11 +43,76 @@ public partial class alglib
      * 
      *************************************************************************/
 
-    public static complex[] fft1(complex[] a)
+    public static complex[] fft1(complex[] a) // equivalent to fft(a) in MATLAB
     {
         int n = ap.len(a);
         complex[] b = copy(a);
         fft.fftc1d(b, n, null);
+
+        return b;
+    }
+
+    public static complex[,] fft1(complex[,] a, int dir = 0)
+    {
+        int m = ap.rows(a);
+        int n = ap.cols(a);
+        complex[,] b = copy(a);
+        
+        if (dir == 1)
+        {
+            for (int i = 0; i < m; i++)
+            {
+                setrow(b, fft1(getrow(b, i)), i);
+            }
+        }
+        else
+        {
+            for (int i = 0; i < n; i++)
+            {
+                setcol(b, fft1(getcol(b, i)), i);
+            }
+        }
+
+        return b;
+    }
+
+    public static complex[,,] fft1(complex[,,] a, int dir = 0)
+    {
+        int m = ap.rows(a);
+        int n = ap.cols(a);
+        int l = ap.deps(a);
+        complex[,,] b = copy(a);
+
+        if (dir == 1)// swap cols (change row)
+        {
+            for (int i = 0; i < m; i++)
+            {
+                for (int j = 0; j < l; j++)
+                {
+                    setrow(b, fft1(getrow(b, i, j)), i, j);
+                }
+            }
+        }
+        else if (dir == 2)
+        {
+            for (int i = 0; i < m; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    setdep(b, fft1(getdep(b, i, j)), i, j);
+                }
+            }
+        }
+        else
+        {
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < l; j++)
+                {
+                    setcol(b, fft1(getcol(b, i, j)), i, j);
+                }
+            }
+        }
 
         return b;
     }
@@ -57,6 +122,71 @@ public partial class alglib
         int n = ap.len(a);
         complex[] b = copy(a);
         fft.fftc1dinv(b, n, null);
+
+        return b;
+    }
+
+    public static complex[,] ifft1(complex[,] a, int dir = 0)
+    {
+        int m = ap.rows(a);
+        int n = ap.cols(a);
+        complex[,] b = copy(a);
+
+        if (dir == 1)
+        {
+            for (int i = 0; i < m; i++)
+            {
+                setrow(b, ifft1(getrow(b, i)), i);
+            }
+        }
+        else
+        {
+            for (int i = 0; i < n; i++)
+            {
+                setcol(b, ifft1(getcol(b, i)), i);
+            }
+        }
+
+        return b;
+    }
+
+    public static complex[,,] ifft1(complex[,,] a, int dir = 0)
+    {
+        int m = ap.rows(a);
+        int n = ap.cols(a);
+        int l = ap.deps(a);
+        complex[,,] b = copy(a);
+
+        if (dir == 1)// swap cols (change row)
+        {
+            for (int i = 0; i < m; i++)
+            {
+                for (int j = 0; j < l; j++)
+                {
+                    setrow(b, ifft1(getrow(b, i, j)), i, j);
+                }
+            }
+        }
+        else if (dir == 2)
+        {
+            for (int i = 0; i < m; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    setdep(b, ifft1(getdep(b, i, j)), i, j);
+                }
+            }
+        }
+        else
+        {
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < l; j++)
+                {
+                    setcol(b, ifft1(getcol(b, i, j)), i, j);
+                }
+            }
+        }
 
         return b;
     }
@@ -80,6 +210,472 @@ public partial class alglib
 
         return b;
     }
+
+    // fftshift
+
+    public static double[] fftshift(double[] a)
+    {
+        int n = ap.len(a);
+        double[] b = copy(a);
+        rotleft(b, (int)Math.Ceiling(n / 2.0), n); // performs fftshift
+
+        return b;
+    }
+
+    public static double[,] fftshift(double[,] a, int dir = -1)
+    {
+        int m = ap.rows(a);
+        int n = ap.cols(a);
+
+        double[,] b = copy(a);
+
+        if (dir == 0) // swap rows (change col)
+        {
+            for (int i = 0; i < n; i++)
+            {
+                setcol(b, fftshift(getcol(b, i)), i);
+            }
+        }
+        else if (dir == 1)// swap cols (change row)
+        {
+            for (int i = 0; i < m; i++)
+            {
+                setrow(b, fftshift(getrow(b, i)), i);
+            }
+        }
+        else  // both side
+        {
+            for (int i = 0; i < m; i++)
+            {
+                setrow(b, fftshift(getrow(b, i)), i);
+            }
+
+            for (int i = 0; i < n; i++)
+            {
+                setcol(b, fftshift(getcol(b, i)), i);
+            }
+        }
+
+        return b;
+    }
+
+    public static double[,,] fftshift(double[,,] a, int dir = -1)
+    {
+        int m = ap.rows(a);
+        int n = ap.cols(a);
+        int l = ap.deps(a);
+
+        double[,,] b = copy(a);
+
+        if (dir == 0) // swap rows (change col)
+        {
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < l; j++)
+                {
+                    setcol(b, fftshift(getcol(b, i, j)), i, j);
+                }
+            }
+        }
+        else if (dir == 1)// swap cols (change row)
+        {
+            for (int i = 0; i < m; i++)
+            {
+                for (int j = 0;j < l; j++)
+                {
+                    setrow(b, fftshift(getrow(b, i, j)), i, j);
+                }
+            }
+        }
+        else if (dir == 2)
+        {
+            for (int i = 0; i < m; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    setdep(b, fftshift(getdep(b, i, j)), i, j);
+                }
+            }
+        }
+        else  
+        {
+            for (int i = 0; i < m; i++)
+            {
+                for (int j = 0; j < l; j++)
+                {
+                    setrow(b, fftshift(getrow(b, i, j)), i, j);
+                }
+            }
+
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < l; j++)
+                {
+                    setcol(b, fftshift(getcol(b, i, j)), i, j);
+                }
+            }
+
+            for (int i = 0; i < m; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    setdep(b, fftshift(getdep(b, i, j)), i, j);
+                }
+            }
+
+        }
+
+        return b;
+    }
+
+    public static complex[] fftshift(complex[] a)
+    {
+        int n = ap.len(a);
+        complex[] b = copy(a);
+        rotleft(b, (int)Math.Ceiling(n / 2.0), n); // performs fftshift
+
+        return b;
+    }
+
+    public static complex[,] fftshift(complex[,] a, int dir = -1)
+    {
+        int m = ap.rows(a);
+        int n = ap.cols(a);
+
+        complex[,] b = copy(a);
+
+        if (dir == 0) // swap rows (change col)
+        {
+            for (int i = 0; i < n; i++)
+            {
+                setcol(b, fftshift(getcol(b, i)), i);
+            }
+        }
+        else if (dir == 1)// swap cols (change row)
+        {
+            for (int i = 0; i < m; i++)
+            {
+                setrow(b, fftshift(getrow(b, i)), i);
+            }
+        }
+        else  // both side
+        {
+            for (int i = 0; i < m; i++)
+            {
+                setrow(b, fftshift(getrow(b, i)), i);
+            }
+
+            for (int i = 0; i < n; i++)
+            {
+                setcol(b, fftshift(getcol(b, i)), i);
+            }
+        }
+
+        return b;
+    }
+
+    public static complex[,,] fftshift(complex[,,] a, int dir = -1)
+    {
+        int m = ap.rows(a);
+        int n = ap.cols(a);
+        int l = ap.deps(a);
+
+        complex[,,] b = copy(a);
+
+        if (dir == 0) // swap rows (change col)
+        {
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < l; j++)
+                {
+                    setcol(b, fftshift(getcol(b, i, j)), i, j);
+                }
+            }
+        }
+        else if (dir == 1)// swap cols (change row)
+        {
+            for (int i = 0; i < m; i++)
+            {
+                for (int j = 0; j < l; j++)
+                {
+                    setrow(b, fftshift(getrow(b, i, j)), i, j);
+                }
+            }
+        }
+        else if (dir == 2)
+        {
+            for (int i = 0; i < m; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    setdep(b, fftshift(getdep(b, i, j)), i, j);
+                }
+            }
+        }
+        else
+        {
+            for (int i = 0; i < m; i++)
+            {
+                for (int j = 0; j < l; j++)
+                {
+                    setrow(b, fftshift(getrow(b, i, j)), i, j);
+                }
+            }
+
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < l; j++)
+                {
+                    setcol(b, fftshift(getcol(b, i, j)), i, j);
+                }
+            }
+
+            for (int i = 0; i < m; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    setdep(b, fftshift(getdep(b, i, j)), i, j);
+                }
+            }
+
+        }
+
+        return b;
+    }
+
+    // ifftshift
+
+    public static double[] ifftshift(double[] a)
+    {
+        int n = ap.len(a);
+        double[] b = copy(a);
+        rotleft(b, (int)Math.Floor(n / 2.0), n); // performs ifftshift
+
+        return b;
+    }
+
+    public static double[,] ifftshift(double[,] a, int dir = -1)
+    {
+        int m = ap.rows(a);
+        int n = ap.cols(a);
+
+        double[,] b = copy(a);
+
+        if (dir == 0) // swap rows (change col)
+        {
+            for (int i = 0; i < n; i++)
+            {
+                setcol(b, ifftshift(getcol(b, i)), i);
+            }
+        }
+        else if (dir == 1)// swap cols (change row)
+        {
+            for (int i = 0; i < m; i++)
+            {
+                setrow(b, ifftshift(getrow(b, i)), i);
+            }
+        }
+        else  // both side
+        {
+            for (int i = 0; i < m; i++)
+            {
+                setrow(b, ifftshift(getrow(b, i)), i);
+            }
+
+            for (int i = 0; i < n; i++)
+            {
+                setcol(b, ifftshift(getcol(b, i)), i);
+            }
+        }
+
+        return b;
+    }
+
+    public static double[,,] ifftshift(double[,,] a, int dir = -1)
+    {
+        int m = ap.rows(a);
+        int n = ap.cols(a);
+        int l = ap.deps(a);
+
+        double[,,] b = copy(a);
+
+        if (dir == 0) // swap rows (change col)
+        {
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < l; j++)
+                {
+                    setcol(b, ifftshift(getcol(b, i, j)), i, j);
+                }
+            }
+        }
+        else if (dir == 1)// swap cols (change row)
+        {
+            for (int i = 0; i < m; i++)
+            {
+                for (int j = 0; j < l; j++)
+                {
+                    setrow(b, ifftshift(getrow(b, i, j)), i, j);
+                }
+            }
+        }
+        else if (dir == 2)
+        {
+            for (int i = 0; i < m; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    setdep(b, ifftshift(getdep(b, i, j)), i, j);
+                }
+            }
+        }
+        else
+        {
+            for (int i = 0; i < m; i++)
+            {
+                for (int j = 0; j < l; j++)
+                {
+                    setrow(b, ifftshift(getrow(b, i, j)), i, j);
+                }
+            }
+
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < l; j++)
+                {
+                    setcol(b, ifftshift(getcol(b, i, j)), i, j);
+                }
+            }
+
+            for (int i = 0; i < m; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    setdep(b, ifftshift(getdep(b, i, j)), i, j);
+                }
+            }
+
+        }
+
+        return b;
+    }
+
+    public static complex[] ifftshift(complex[] a)
+    {
+        int n = ap.len(a);
+        complex[] b = copy(a);
+        rotleft(b, (int)Math.Floor(n / 2.0), n); // performs ifftshift
+
+        return b;
+    }
+
+    public static complex[,] ifftshift(complex[,] a, int dir = -1)
+    {
+        int m = ap.rows(a);
+        int n = ap.cols(a);
+
+        complex[,] b = copy(a);
+
+        if (dir == 0) // swap rows (change col)
+        {
+            for (int i = 0; i < n; i++)
+            {
+                setcol(b, ifftshift(getcol(b, i)), i);
+            }
+        }
+        else if (dir == 1)// swap cols (change row)
+        {
+            for (int i = 0; i < m; i++)
+            {
+                setrow(b, ifftshift(getrow(b, i)), i);
+            }
+        }
+        else  // both side
+        {
+            for (int i = 0; i < m; i++)
+            {
+                setrow(b, ifftshift(getrow(b, i)), i);
+            }
+
+            for (int i = 0; i < n; i++)
+            {
+                setcol(b, ifftshift(getcol(b, i)), i);
+            }
+        }
+
+        return b;
+    }
+
+    public static complex[,,] ifftshift(complex[,,] a, int dir = -1)
+    {
+        int m = ap.rows(a);
+        int n = ap.cols(a);
+        int l = ap.deps(a);
+
+        complex[,,] b = copy(a);
+
+        if (dir == 0) // swap rows (change col)
+        {
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < l; j++)
+                {
+                    setcol(b, ifftshift(getcol(b, i, j)), i, j);
+                }
+            }
+        }
+        else if (dir == 1)// swap cols (change row)
+        {
+            for (int i = 0; i < m; i++)
+            {
+                for (int j = 0; j < l; j++)
+                {
+                    setrow(b, ifftshift(getrow(b, i, j)), i, j);
+                }
+            }
+        }
+        else if (dir == 2)
+        {
+            for (int i = 0; i < m; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    setdep(b, ifftshift(getdep(b, i, j)), i, j);
+                }
+            }
+        }
+        else
+        {
+            for (int i = 0; i < m; i++)
+            {
+                for (int j = 0; j < l; j++)
+                {
+                    setrow(b, ifftshift(getrow(b, i, j)), i, j);
+                }
+            }
+
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < l; j++)
+                {
+                    setcol(b, ifftshift(getcol(b, i, j)), i, j);
+                }
+            }
+
+            for (int i = 0; i < m; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    setdep(b, ifftshift(getdep(b, i, j)), i, j);
+                }
+            }
+
+        }
+
+        return b;
+    }
+
+    // additional functionalities use to perform shift
 
     public static int gcd(int a, int b)
     {
@@ -135,190 +731,6 @@ public partial class alglib
             }
             a[j] = tmp;
         }
-    }
-
-    public static complex[] fftshift(complex[] a)
-    {
-        int n = ap.len(a);
-        complex[] b = copy(a);
-        rotleft(b, (int)Math.Ceiling(n / 2.0), n); // performs fftshift
-
-        return b;
-    }
-
-    public static complex[,] fftshift(complex[,] a, int dir = -1)
-    {
-        int m = ap.rows(a);
-        int n = ap.cols(a);
-
-        complex[,] b = copy(a);
-
-        if (dir == 0) // swap rows (change col)
-        {
-            for (int i = 0; i < n; i++)
-            {
-                setcol(b, fftshift(getcol(b, i)), i);
-            }
-        }
-        else if (dir == 1)// swap cols (change row)
-        {
-            for (int i = 0; i < m; i++)
-            {
-                setrow(b, fftshift(getrow(b, i)), i);
-            }
-        }
-        else  // both side
-        {
-            for (int i = 0; i < m; i++)
-            {
-                setrow(b, fftshift(getrow(b, i)), i);
-            }
-
-            for (int i = 0; i < n; i++)
-            {
-                setcol(b, fftshift(getcol(b, i)), i);
-            }
-        }
-
-        return b;
-    }
-
-    public static complex[] ifftshift(complex[] a)
-    {
-        int n = ap.len(a);
-        complex[] b = copy(a);
-        rotleft(b, (int)Math.Floor(n / 2.0), n); // performs ifftshift
-
-        return b;
-    }
-
-    public static complex[,] ifftshift(complex[,] a, int dir = -1)
-    {
-        int m = ap.rows(a);
-        int n = ap.cols(a);
-
-        complex[,] b = copy(a);
-
-        if (dir == 0) // swap rows (change col)
-        {
-            for (int i = 0; i < n; i++)
-            {
-                setcol(b, ifftshift(getcol(b, i)), i);
-            }
-        }
-        else if (dir == 1)// swap cols (change row)
-        {
-            for (int i = 0; i < m; i++)
-            {
-                setrow(b, ifftshift(getrow(b, i)), i);
-            }
-        }
-        else  // both side
-        {
-            for (int i = 0; i < m; i++)
-            {
-                setrow(b, ifftshift(getrow(b, i)), i);
-            }
-
-            for (int i = 0; i < n; i++)
-            {
-                setcol(b, ifftshift(getcol(b, i)), i);
-            }
-        }
-
-        return b;
-    }
-
-    public static double[] fftshift(double[] a)
-    {
-        int n = ap.len(a);
-        double[] b = copy(a);
-        rotleft(b, (int)Math.Ceiling(n / 2.0), n); // performs fftshift
-
-        return b;
-    }
-
-    public static double[,] fftshift(double[,] a, int dir = -1)
-    {
-        int m = ap.rows(a);
-        int n = ap.cols(a);
-
-        double[,] b = copy(a);
-
-        if (dir == 0) // swap rows (change col)
-        {
-            for (int i = 0; i < n; i++)
-            {
-                setcol(b, fftshift(getcol(b, i)), i);
-            }
-        }
-        else if (dir == 1)// swap cols (change row)
-        {
-            for (int i = 0; i < m; i++)
-            {
-                setrow(b, fftshift(getrow(b, i)), i);
-            }
-        }
-        else  // both side
-        {
-            for (int i = 0; i < m; i++)
-            {
-                setrow(b, fftshift(getrow(b, i)), i);
-            }
-
-            for (int i = 0; i < n; i++)
-            {
-                setcol(b, fftshift(getcol(b, i)), i);
-            }
-        }
-
-        return b;
-    }
-
-    public static double[] ifftshift(double[] a)
-    {
-        int n = ap.len(a);
-        double[] b = copy(a);
-        rotleft(b, (int)Math.Floor(n / 2.0), n); // performs ifftshift
-
-        return b;
-    }
-
-    public static double[,] ifftshift(double[,] a, int dir = -1)
-    {
-        int m = ap.rows(a);
-        int n = ap.cols(a);
-
-        double[,] b = copy(a);
-
-        if (dir == 0) // swap rows (change col)
-        {
-            for (int i = 0; i < n; i++)
-            {
-                setcol(b, ifftshift(getcol(b, i)), i);
-            }
-        }
-        else if (dir == 1)// swap cols (change row)
-        {
-            for (int i = 0; i < m; i++)
-            {
-                setrow(b, ifftshift(getrow(b, i)), i);
-            }
-        }
-        else  // both side
-        {
-            for (int i = 0; i < m; i++)
-            {
-                setrow(b, ifftshift(getrow(b, i)), i);
-            }
-
-            for (int i = 0; i < n; i++)
-            {
-                setcol(b, ifftshift(getcol(b, i)), i);
-            }
-        }
-
-        return b;
     }
 
 }

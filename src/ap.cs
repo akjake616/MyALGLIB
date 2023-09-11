@@ -419,7 +419,10 @@ public static partial class alglib // self-written functionalities
      * use get (set) for more general usage
      * 
      *************************************************************************/
-    public static double[] getrow(double[,] m, int r)
+
+    // get
+
+    public static double[] getrow(double[,] m, int r) // equivalent to m(r,:) in MATLAB
     {
         double[] v = new double[ap.cols(m)];
         for (int i = 0; i < ap.cols(m); i++)
@@ -427,7 +430,31 @@ public static partial class alglib // self-written functionalities
         return v;
     }
 
-    public static double[] getcol(double[,] m, int c)
+    public static double[] getrow(double[,,] m, int r, int d) // equivalent to m(r,:,d) in MATLAB
+    {
+        double[] v = new double[ap.cols(m)];
+        for (int i = 0; i < ap.cols(m); i++)
+            v[i] = m[r, i, d];
+        return v;
+    }
+
+    public static complex[] getrow(complex[,] m, int r) 
+    {
+        complex[] v = new complex[ap.cols(m)];
+        for (int i = 0; i < ap.cols(m); i++)
+            v[i] = m[r, i];
+        return v;
+    }
+
+    public static complex[] getrow(complex[,,] m, int r, int d)
+    {
+        complex[] v = new complex[ap.cols(m)];
+        for (int i = 0; i < ap.cols(m); i++)
+            v[i] = m[r, i, d];
+        return v;
+    }
+
+    public static double[] getcol(double[,] m, int c) // equivalent to m(:,c) in MATLAB
     {
         double[] v = new double[ap.rows(m)];
         for (int i = 0; i < ap.rows(m); i++)
@@ -435,23 +462,11 @@ public static partial class alglib // self-written functionalities
         return v;
     }
 
-    public static void setrow(double[,] m, double[] v, int r)
+    public static double[] getcol(double[,,] m, int c, int d) // equivalent to m(:,c,d) in MATLAB
     {
-        for (int i = 0; i < ap.cols(m); i++)
-            m[r, i] = v[i];
-    }
-
-    public static void setcol(double[,] m, double[] v, int c)
-    {
+        double[] v = new double[ap.rows(m)];
         for (int i = 0; i < ap.rows(m); i++)
-            m[i, c] = v[i];
-    }
-
-    public static complex[] getrow(complex[,] m, int r)
-    {
-        complex[] v = new complex[ap.cols(m)];
-        for (int i = 0; i < ap.cols(m); i++)
-            v[i] = m[r, i];
+            v[i] = m[i, c, d];
         return v;
     }
 
@@ -463,16 +478,90 @@ public static partial class alglib // self-written functionalities
         return v;
     }
 
+    public static complex[] getcol(complex[,,] m, int c, int d)
+    {
+        complex[] v = new complex[ap.rows(m)];
+        for (int i = 0; i < ap.rows(m); i++)
+            v[i] = m[i, c, d];
+        return v;
+    }
+
+    public static double[] getdep(double[,,] m, int r, int c) // equivalent to m(r,c,:) in MATLAB
+    {
+        double[] v = new double[ap.deps(m)];
+        for (int i = 0; i < ap.deps(m); i++)
+            v[i] = m[r, c, i];
+        return v;
+    }
+
+    public static complex[] getdep(complex[,,] m, int r, int c)
+    {
+        complex[] v = new complex[ap.deps(m)];
+        for (int i = 0; i < ap.deps(m); i++)
+            v[i] = m[r, c, i];
+        return v;
+    }
+
+    // set
+
+    public static void setrow(double[,] m, double[] v, int r)
+    {
+        for (int i = 0; i < ap.len(v); i++)
+            m[r, i] = v[i];
+    }
+
+    public static void setrow(double[,,] m, double[] v, int r, int d)
+    {
+        for (int i = 0; i < ap.len(v); i++)
+            m[r, i, d] = v[i];
+    }
+
     public static void setrow(complex[,] m, complex[] v, int r)
     {
-        for (int i = 0; i < ap.cols(m); i++)
+        for (int i = 0; i < ap.len(v); i++)
             m[r, i] = v[i];
+    }
+
+    public static void setrow(complex[,,] m, complex[] v, int r, int d)
+    {
+        for (int i = 0; i < ap.len(v); i++)
+            m[r, i, d] = v[i];
+    }
+
+    public static void setcol(double[,] m, double[] v, int c)
+    {
+        for (int i = 0; i < ap.len(v); i++)
+            m[i, c] = v[i];
+    }
+
+    public static void setcol(double[,,] m, double[] v, int c, int d)
+    {
+        for (int i = 0; i < ap.len(v); i++)
+            m[i, c, d] = v[i];
     }
 
     public static void setcol(complex[,] m, complex[] v, int c)
     {
-        for (int i = 0; i < ap.rows(m); i++)
+        for (int i = 0; i < ap.len(v); i++)
             m[i, c] = v[i];
+    }
+
+    public static void setcol(complex[,,] m, complex[] v, int c, int d)
+    {
+        for (int i = 0; i < ap.len(v); i++)
+            m[i, c, d] = v[i];
+    }
+
+    public static void setdep(double[,,] m, double[] v, int r, int c)
+    {
+        for (int i = 0; i < ap.len(v); i++)
+            m[r, c, i] = v[i];
+    }
+
+    public static void setdep(complex[,,] m, complex[] v, int r, int c)
+    {
+        for (int i = 0; i < ap.len(v); i++)
+            m[r, c, i] = v[i];
     }
 
     /*************************************************************************
@@ -4332,10 +4421,19 @@ public partial class alglib
     {
         public static int len<T>(T[] a)
         { return a.Length; }
+
         public static int rows<T>(T[,] a)
         { return a.GetLength(0); }
         public static int cols<T>(T[,] a)
         { return a.GetLength(1); }
+
+        public static int rows<T>(T[,,] a)
+        { return a.GetLength(0); }
+        public static int cols<T>(T[,,] a)
+        { return a.GetLength(1); }
+        public static int deps<T>(T[,,] a)
+        { return a.GetLength(2); }
+
         public static void swap<T>(ref T a, ref T b)
         {
             T t = a;
